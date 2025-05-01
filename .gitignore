@@ -1,0 +1,31 @@
+# .gitignore file
+
+# Backend stuff
+
+Backend/Flask/venv
+Backend/Flask/db.yaml
+# typisch temporere Dareien für Python
+__pycache__/
+*.pyc
+
+# Frontend stuff + das was von Vue Vorgeschlagen wurde
+
+.DS_Store
+Frontend/frontmusa/node_modules/
+Frontend/frontmusa/dist/
+# local env files
+.env.local
+.env.*.local
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
