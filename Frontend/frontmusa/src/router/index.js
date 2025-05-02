@@ -5,6 +5,7 @@ import bookAppointment from '../components/bookAppointment.vue'
 import UserList from '../components/UserList.vue'
 import Coverpage from '../views/Coverpage.vue'
 import AppointmentCalender from '../views/AppointmentCalender.vue'
+import AuthModal from '@/components/AuthModal.vue'
 
 const routes = [
   { path: '/', component: Coverpage },
@@ -17,6 +18,7 @@ const routes = [
   { path: '/book', component: bookAppointment },
   { path: '/users', component: UserList },
   { path: '/appointment-calender', component: AppointmentCalender },
+  { path: '/authmodal', component: AuthModal, props: true }
 ]
 
 const router = createRouter({

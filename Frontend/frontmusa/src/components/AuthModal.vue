@@ -1,12 +1,9 @@
 <template>
   <div class="modal-overlay" @click.self="closeModal">
     <div class="modal">
-      <!-- Fehlermeldung und Ladeanzeige -->
-      <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
-      <div v-if="isLoading" class="loading-spinner">Lade...</div>
-
       <div class="modal-header">
-        <h2>{{ activeTab === "login" ? "Login" : "Registrierung" }}</h2>
+        <h2 v-if="activeTab === 'login'">Login</h2>
+        <h2 v-else>Registrierung</h2>
         <button class="close-btn" @click="closeModal">&times;</button>
       </div>
 
@@ -93,89 +90,107 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { ref, computed } from "vue";
+  
+  <script>
 import axios from "axios";
-import { auth, setToken } from "../auth.js";
+import { setToken } from "../auth"; // Importiere deine Auth-Manager-Funktionen
 
-// Reactive State
-const activeTab = ref("login");
-const loginData = ref({ email: "", password: "" });
-const registerData = ref({
-  name: "",
-  email: "",
-  phonenumber: "",
-  password: "",
-});
-const isLoading = ref(false);
-const errorMessage = ref("");
+export default {
+  name: "AuthModal",
+  props: {
+    currentUser: {
+      type: Object,
+      default: () => null,
+    },
+  },
+  data() {
+    return {
+      activeTab: "login",
+      loginData: {
+        email: "",
+        password: "",
+      },
+      registerData: {
+        name: "",
+        email: "",
+        phonenumber: "",
+        password: "",
+      },
+    };
+  },
+  methods: {
+    closeModal() {
+      this.$emit("close");
+    },
+    async handleLogin() {
+      try {
+        const loginRes = await axios.post(
+          "http://192.168.178.104:5000/login",
+          this.loginData,
+          {
+            headers: { "Content-Type": "application/json" },
+            withCredentials: true,
+          }
+        );
+        setToken(loginRes.data.access_token);
 
-// Computed für Auth
-const user = computed(() => auth.user || {});
+        // Jetzt alle User holen
+        const usersRes = await axios.get("http://192.168.178.104:5000/users", {
+          headers: {
+            // falls benötigt:
+            Authorization: `Bearer ${loginRes.data.access_token}`,
+          },
+        });
+        const allUsers = usersRes.data;
 
-// Methods
-async function handleLogin() {
-  isLoading.value = true;
-  errorMessage.value = "";
-  try {
-    const resp = await axios.post(
-      "http://192.168.178.104:5000/login",
-      loginData.value
-    );
-    const token = resp.data.access_token;
+        // per E-Mail den gerade eingeloggten finden
+        const currentUser = allUsers.find(
+          (u) => u.email.toLowerCase() === this.loginData.email.toLowerCase()
+        );
+        if (!currentUser) {
+          throw new Error("User nicht gefunden!");
+        }
 
-    // Nutzer-Daten abrufen
-    const meResp = await axios.get("http://192.168.178.104:5000/me", {
-      headers: { Authorization: "Bearer " + token },
-    });
+        console.log(
+          "Eingeloggt als:",
+          currentUser.name,
+          "(ID:",
+          currentUser.id,
+          ")"
+        );
+        this.$emit("user-logged-in", currentUser);
 
-    setToken(token, meResp.data);
-    alert("Login erfolgreich!");
-    closeModal();
-  } catch (err) {
-    console.error("Login-Error:", err);
-    errorMessage.value = err.response?.data?.error || "Login fehlgeschlagen!";
-  } finally {
-    isLoading.value = false;
-  }
-}
+        alert("Login erfolgreich!");
+        this.closeModal();
+      } catch (error) {
+        console.error("Login/Register error:", error);
+        alert("Login fehlgeschlagen!");
+      }
+    },
 
-async function handleRegister() {
-  isLoading.value = true;
-  errorMessage.value = "";
-  try {
-    const resp = await axios.post(
-      "http://192.168.178.104:5000/register",
-      registerData.value,
-      { withCredentials: true }
-    );
-    const token = resp.data.access_token;
-
-    // Nutzer-Daten abrufen
-    const meResp = await axios.get("http://192.168.178.104:5000/me", {
-      headers: { Authorization: "Bearer " + token },
-    });
-
-    setToken(token, meResp.data);
-    alert("Registrierung erfolgreich!");
-    closeModal();
-  } catch (err) {
-    console.error("Register-Error:", err);
-    errorMessage.value =
-      err.response?.data?.error || "Registrierung fehlgeschlagen!";
-  } finally {
-    isLoading.value = false;
-  }
-}
-
-function closeModal() {
-  // Emit schließt das Modal in der Elternkomponente
-  emit("close");
-}
+    async handleRegister() {
+      try {
+        const response = await axios.post(
+          "http://192.168.178.104:5000/register",
+          this.registerData,
+          {
+            headers: { "Content-Type": "application/json" },
+            withCredentials: true,
+          }
+        );
+        alert("Registrierung erfolgreich! Bitte melde dich an.");
+        // Nach erfolgreicher Registrierung zum Login-Tab wechseln
+        this.activeTab = "login";
+      } catch (error) {
+        console.error("Registrierung error:", error);
+        alert("Registrierung fehlgeschlagen!");
+      }
+    },
+  },
+};
 </script>
-
-<style scoped>
+  
+  <style scoped>
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -188,6 +203,7 @@ function closeModal() {
   align-items: center;
   z-index: 1000;
 }
+
 .modal {
   background: #fff;
   border-radius: 8px;
@@ -196,22 +212,26 @@ function closeModal() {
   max-width: 90%;
   position: relative;
 }
+
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 .close-btn {
   background: transparent;
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
 }
+
 .modal-tabs {
   display: flex;
   justify-content: center;
   margin-top: 1rem;
 }
+
 .modal-tabs button {
   flex: 1;
   padding: 0.5rem;
@@ -220,26 +240,23 @@ function closeModal() {
   border: none;
   border-bottom: 2px solid transparent;
 }
+
 .modal-tabs button.active {
   border-bottom: 2px solid #4caf50;
   font-weight: bold;
 }
+
 .modal-content {
   margin-top: 1rem;
 }
+
 .form-group {
   margin-bottom: 1rem;
 }
+
 input {
   width: 100%;
   padding: 0.5rem;
   box-sizing: border-box;
-}
-.error-message {
-  color: red;
-  margin-bottom: 0.5rem;
-}
-.loading-spinner {
-  margin-bottom: 0.5rem;
 }
 </style>

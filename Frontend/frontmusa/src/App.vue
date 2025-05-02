@@ -8,7 +8,7 @@
 
       <div class="auth-status">
         <template v-if="isAuthenticated">
-          <span>Hallo, {{ auth.user.name || "User" }}</span>
+          <span>Hallo, {{ props.currentUser?.name || "User" }}</span>
           <button @click="logout">Logout</button>
         </template>
         <template v-else>
@@ -28,6 +28,13 @@
 import { ref, computed } from "vue";
 import AuthModal from "./components/AuthModal.vue";
 import { auth, clearToken } from "./auth.js";
+
+const props = defineProps({
+  currentUser: {
+    type: Object,
+    default: () => null,
+  },
+});
 
 // Steuerung des Auth-Modals
 const showAuthModal = ref(false);
