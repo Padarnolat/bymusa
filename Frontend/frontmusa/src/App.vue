@@ -3,7 +3,6 @@
     <nav class="navbar">
       <router-link to="/">Home</router-link> |
       <router-link to="/testlab">Testlab</router-link> |
-      <router-link to="/about">About</router-link> |
       <router-link to="/users">Users</router-link> |
       <router-link to="/appointment-calendar">Terminkalender</router-link>
 

@@ -13,11 +13,6 @@ const routes = [
     name: 'testlab',
     component: testlabView
   },
-  {
-    path: '/about',
-    name: 'about',
-    component: () => import('../views/AboutView.vue')
-  },
   { path: '/register', component: Register },
   { path: '/book', component: bookAppointment },
   { path: '/users', component: UserList },
