@@ -86,11 +86,7 @@ def me():
     current_user_id = get_jwt_identity()
     user = User.query.get(current_user_id)
     return jsonify({
-        "id": user.id,
-        "name": user.name,
         "email": user.email,
-        "phonenumber": user.phonenumber,
-        "role": user.role
     }), 200
 
 # Neuer Login-Endpunkt mit JWT

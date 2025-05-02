@@ -4,11 +4,11 @@
       <router-link to="/">Home</router-link> |
       <router-link to="/testlab">Testlab</router-link> |
       <router-link to="/users">Users</router-link> |
-      <router-link to="/appointment-calendar">Terminkalender</router-link>
+      <router-link to="/appointment-calender">Terminkalender</router-link>
 
       <div class="auth-status">
         <template v-if="isAuthenticated">
-          <span>Hallo, {{ props.currentUser?.name || "User" }}</span>
+          <span>Hallo, {{ currentUser?.name || "User" }}</span>
           <button @click="logout">Logout</button>
         </template>
         <template v-else>
@@ -18,7 +18,12 @@
     </nav>
 
     <!-- Auth-Modal -->
-    <AuthModal v-if="showAuthModal" @close="closeAuthModal" />
+    <AuthModal
+      v-if="showAuthModal"
+      :current-user="currentUser"
+      @close="closeAuthModal"
+      @user-logged-in="onUserLoggedIn"
+    />
 
     <router-view />
   </div>
@@ -29,19 +34,19 @@ import { ref, computed } from "vue";
 import AuthModal from "./components/AuthModal.vue";
 import { auth, clearToken } from "./auth.js";
 
-const props = defineProps({
-  currentUser: {
-    type: Object,
-    default: () => null,
-  },
-});
-
 // Steuerung des Auth-Modals
 const showAuthModal = ref(false);
+const currentUser = ref(null);
+
 function openAuthModal() {
   showAuthModal.value = true;
 }
 function closeAuthModal() {
+  showAuthModal.value = false;
+}
+
+function onUserLoggedIn(user) {
+  currentUser.value = user; // ← hier: setze eingeloggten User
   showAuthModal.value = false;
 }
 
@@ -51,6 +56,7 @@ const isAuthenticated = computed(() => !!auth.token);
 // Logout-Funktion
 function logout() {
   clearToken();
+  currentUser.value = null;
 }
 </script>
 

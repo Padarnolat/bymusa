@@ -91,18 +91,12 @@
   </div>
 </template>
   
-  <script>
+<script>
 import axios from "axios";
 import { setToken } from "../auth"; // Importiere deine Auth-Manager-Funktionen
 
 export default {
   name: "AuthModal",
-  props: {
-    currentUser: {
-      type: Object,
-      default: () => null,
-    },
-  },
   data() {
     return {
       activeTab: "login",
@@ -122,6 +116,25 @@ export default {
     closeModal() {
       this.$emit("close");
     },
+    created() {
+      this.tryAutoLogin();
+    },
+    async tryAutoLogin() {
+      const token = localStorage.getItem("access_token");
+      if (!token) return;
+      try {
+        const meRes = await axios.get("http://192.168.178.104:5000/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const currentUser = meRes.data;
+        this.$emit("user-logged-in", currentUser);
+        this.closeModal();
+      } catch (err) {
+        console.error("Auto-Login fehlgeschlagen", err);
+        localStorage.removeItem("access_token");
+      }
+    },
+
     async handleLogin() {
       try {
         const loginRes = await axios.post(
@@ -133,6 +146,7 @@ export default {
           }
         );
         setToken(loginRes.data.access_token);
+        localStorage.setItem("access_token", loginRes.data.access_token);
 
         // Jetzt alle User holen
         const usersRes = await axios.get("http://192.168.178.104:5000/users", {
