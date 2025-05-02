@@ -11,9 +11,16 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 app = Flask(__name__)
 
 # Update CORS configuration with all necessary settings
-CORS(app,
-     origins=["http://192.168.178.104:8080", "http://localhost:8080"],
-     supports_credentials=True)
+# Update CORS configuration with all necessary settings
+CORS(app, resources={
+    r"/*": {
+        "origins": ["http://192.168.178.104:8080", "http://localhost:8080"],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization", "Access-Control-Allow-Credentials"],
+        "supports_credentials": True,
+        "expose_headers": ["Content-Range", "X-Content-Range"]
+    }
+})
 
 # Enable CORS pre-flight requests
 def add_cors_headers(response):
