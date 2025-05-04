@@ -15,6 +15,12 @@
           <button @click="openAuthModal">Login</button>
         </template>
       </div>
+      <div>
+        <template>
+          <div v-if="currentUser">Angemeldet als: {{ currentUser.name }}</div>
+          <div v-else>Nicht eingeloggt</div>
+        </template>
+      </div>
     </nav>
 
     <!-- Auth-Modal -->
@@ -29,6 +35,17 @@
   </div>
 </template>
 
+<script>
+import { mapState } from "vuex";
+export default {
+  computed: {
+    ...mapState("auth", ["user"]),
+    currentUser() {
+      return this.user;
+    },
+  },
+};
+</script>
 <script setup>
 import { ref, computed } from "vue";
 import AuthModal from "./components/AuthModal.vue";

@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
+
+// Components und Views
 import testlabView from '../views/Testlab.vue'
 import Register from '../components/Register.vue'
 import bookAppointment from '../components/bookAppointment.vue'
@@ -9,11 +11,7 @@ import AuthModal from '@/components/AuthModal.vue'
 
 const routes = [
   { path: '/', component: Coverpage },
-  {
-    path: '/testlab',
-    name: 'testlab',
-    component: testlabView
-  },
+  { path: '/testlab', name: 'testlab', component: testlabView },
   { path: '/register', component: Register },
   { path: '/book', component: bookAppointment },
   { path: '/users', component: UserList },

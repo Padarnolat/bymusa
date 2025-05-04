@@ -11,7 +11,6 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 app = Flask(__name__)
 
 # Update CORS configuration with all necessary settings
-# Update CORS configuration with all necessary settings
 CORS(app, resources={
     r"/*": {
         "origins": ["http://192.168.178.104:8080", "http://localhost:8080"],
