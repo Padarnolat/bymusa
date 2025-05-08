@@ -10,6 +10,7 @@ import FullCalendar from "@fullcalendar/vue3";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import deLocale from "@fullcalendar/core/locales/de";
+import { API_ENDPOINTS } from "../config";
 
 export default {
   components: {
@@ -41,23 +42,21 @@ export default {
             </div>`,
         }),
       },
+      appointments: [],
     };
   },
-  async mounted() {
-    try {
-      const response = await axios.get(
-        "http://192.168.178.104:5000/appointments"
-      );
-      this.calendarOptions.events = response.data.map((appointment) => ({
-        title: `Termin bei ${appointment.barber_name}`,
-        start: `${appointment.appointment_date}T${appointment.appointment_time}`,
-        color: "#2e7d32",
-        borderColor: "#1b5e20",
-        textColor: "#fff",
-      }));
-    } catch (error) {
-      console.error("Fehler beim Abrufen der Termine:", error);
-    }
+  methods: {
+    async fetchAppointments() {
+      try {
+        const response = await axios.get(API_ENDPOINTS.APPOINTMENTS);
+        this.appointments = response.data;
+      } catch (error) {
+        console.error("Error fetching appointments:", error);
+      }
+    },
+  },
+  mounted() {
+    this.fetchAppointments();
   },
 };
 </script>

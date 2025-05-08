@@ -18,13 +18,26 @@
   
 <script>
 import axios from "axios";
+import { API_ENDPOINTS } from "../config";
+
 export default {
   data() {
-    return { users: [] };
+    return {
+      users: [],
+    };
   },
-  async mounted() {
-    const response = await axios.get("http://192.168.178.104:5000/users");
-    this.users = response.data;
+  methods: {
+    async fetchUsers() {
+      try {
+        const response = await axios.get(API_ENDPOINTS.USERS);
+        this.users = response.data;
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    },
+  },
+  mounted() {
+    this.fetchUsers();
   },
 };
 </script>

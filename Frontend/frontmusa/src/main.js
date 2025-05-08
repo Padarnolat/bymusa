@@ -1,11 +1,12 @@
 import { createApp } from 'vue';
 import App from './App.vue';
-
-// Viox
 import router from './router'
 import store from './store'
 import axios from 'axios'
+import { API_BASE_URL } from './config'
 
+// Set axios defaults
+axios.defaults.baseURL = API_BASE_URL
 
 const token = localStorage.getItem('token')
 if (token) {

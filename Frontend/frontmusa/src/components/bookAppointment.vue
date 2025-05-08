@@ -47,6 +47,8 @@
 
 <script>
 import axios from "axios";
+import { API_ENDPOINTS } from "../config";
+
 export default {
   data() {
     return {
@@ -59,11 +61,10 @@ export default {
   methods: {
     async bookAppointment() {
       try {
-        // Format the time to include seconds
         const formattedTime = this.appointment_time + ":00";
 
         const response = await axios.post(
-          "http://192.168.178.104:5000/book_appointment",
+          API_ENDPOINTS.BOOK_APPOINTMENT,
           {
             user_id: this.user_id,
             barber_id: this.barber_id,

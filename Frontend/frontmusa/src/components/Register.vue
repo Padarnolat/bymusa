@@ -49,6 +49,8 @@
 
 <script>
 import axios from "axios";
+import { API_ENDPOINTS } from "../config";
+
 export default {
   data() {
     return { name: "", email: "", phonenumber: "", password: "" };
@@ -56,7 +58,7 @@ export default {
   methods: {
     async register() {
       try {
-        await axios.post("http://192.168.178.104:5000/register", {
+        await axios.post(API_ENDPOINTS.REGISTER, {
           name: this.name,
           email: this.email,
           phonenumber: this.phonenumber,

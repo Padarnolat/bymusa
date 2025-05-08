@@ -93,7 +93,8 @@
   
 <script>
 import axios from "axios";
-import { setToken } from "../auth"; // Importiere deine Auth-Manager-Funktionen
+import { setToken } from "../auth";
+import { API_ENDPOINTS } from "../config";
 
 export default {
   name: "AuthModal",
@@ -123,7 +124,7 @@ export default {
       const token = localStorage.getItem("access_token");
       if (!token) return;
       try {
-        const meRes = await axios.get("http://192.168.178.104:5000/me", {
+        const meRes = await axios.get(API_ENDPOINTS.ME, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const currentUser = meRes.data;
@@ -137,27 +138,20 @@ export default {
 
     async handleLogin() {
       try {
-        const loginRes = await axios.post(
-          "http://192.168.178.104:5000/login",
-          this.loginData,
-          {
-            headers: { "Content-Type": "application/json" },
-            withCredentials: true,
-          }
-        );
+        const loginRes = await axios.post(API_ENDPOINTS.LOGIN, this.loginData, {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        });
         setToken(loginRes.data.access_token);
         localStorage.setItem("access_token", loginRes.data.access_token);
 
-        // Jetzt alle User holen
-        const usersRes = await axios.get("http://192.168.178.104:5000/users", {
+        const usersRes = await axios.get(API_ENDPOINTS.USERS, {
           headers: {
-            // falls benötigt:
             Authorization: `Bearer ${loginRes.data.access_token}`,
           },
         });
         const allUsers = usersRes.data;
 
-        // per E-Mail den gerade eingeloggten finden
         const currentUser = allUsers.find(
           (u) => u.email.toLowerCase() === this.loginData.email.toLowerCase()
         );
@@ -185,7 +179,7 @@ export default {
     async handleRegister() {
       try {
         const response = await axios.post(
-          "http://192.168.178.104:5000/register",
+          API_ENDPOINTS.REGISTER,
           this.registerData,
           {
             headers: { "Content-Type": "application/json" },
@@ -193,7 +187,6 @@ export default {
           }
         );
         alert("Registrierung erfolgreich! Bitte melde dich an.");
-        // Nach erfolgreicher Registrierung zum Login-Tab wechseln
         this.activeTab = "login";
       } catch (error) {
         console.error("Registrierung error:", error);
