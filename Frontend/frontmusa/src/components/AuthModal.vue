@@ -20,6 +20,9 @@
         >
           Registrieren
         </button>
+        <div>      
+          <GoogleSignIn @signed-in="handleSignIn" @signed-out="handleGoogleSignOut" />
+        </div>
       </div>
 
       <div class="modal-content">
@@ -95,9 +98,14 @@
 import axios from "axios";
 import { setToken } from "../auth";
 import { API_ENDPOINTS } from "../config";
+import GoogleSignIn from '@/components/GoogleSignIn.vue';
+import { signOutGoogle } from '@/plugins/googleAuth';
 
 export default {
   name: "AuthModal",
+  components: {
+    GoogleSignIn,
+  },
   data() {
     return {
       activeTab: "login",
@@ -114,6 +122,10 @@ export default {
     };
   },
   methods: {
+    handleSignIn(payload) {
+      console.log('Nutzer angemeldet:', payload);
+      // Hier kannst du z. B. das Token im Vuex-Store speichern oder direkt ans Backend schicken.
+    },
     closeModal() {
       this.$emit("close");
     },
@@ -191,6 +203,15 @@ export default {
       } catch (error) {
         console.error("Registrierung error:", error);
         alert("Registrierung fehlgeschlagen!");
+      }
+    },
+    async handleGoogleSignOut() {
+      try {
+        await signOutGoogle();
+        this.closeModal();
+      } catch (error) {
+        console.error('Logout fehlgeschlagen:', error);
+        alert('Logout fehlgeschlagen!');
       }
     },
   },
